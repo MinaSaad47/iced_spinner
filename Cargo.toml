@@ -1,10 +1,11 @@
 [package]
 name = "iced_spinner"
+authors = ["Iohann Rabeson"]
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-iced = "0.8.0"
-iced_native = "0.9.1"
+iced = { git = "https://github.com/iced-rs/iced" }
+iced_native = { git = "https://github.com/iced-rs/iced" }
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
