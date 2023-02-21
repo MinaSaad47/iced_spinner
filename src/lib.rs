@@ -22,7 +22,7 @@ impl Default for Spinner {
             width: Length::Shrink,
             height: Length::Shrink,
             rate: Duration::from_secs_f32(1.0),
-            padding: 4.0,
+            padding: 0.0,
             radius: 2.0,
         }
     }
