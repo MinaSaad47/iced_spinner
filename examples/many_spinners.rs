@@ -2,15 +2,17 @@ use iced::{
     widget::{column, container},
     Element, Length, Sandbox, Settings,
 };
+use iced::widget::vertical_space;
 use iced_spinner::spinner;
 use std::time::Duration;
+use iced_native::widget::scrollable;
 
-struct SpinnerExample;
+struct ManySpinnersExample;
 
 #[derive(Clone, Debug)]
 enum Message {}
 
-impl Sandbox for SpinnerExample {
+impl Sandbox for ManySpinnersExample {
     type Message = Message;
 
     fn new() -> Self {
@@ -18,7 +20,7 @@ impl Sandbox for SpinnerExample {
     }
 
     fn title(&self) -> String {
-        String::from("Spinner")
+        String::from("Many Spinners")
     }
 
     fn update(&mut self, message: Self::Message) {
@@ -26,20 +28,14 @@ impl Sandbox for SpinnerExample {
     }
 
     fn view(&self) -> Element<Self::Message> {
-        let s = spinner()
-            .rate(Duration::from_secs_f32(1.0))
-            .width(Length::Fixed(64.0))
-            .height(Length::Fixed(64.0));
+        let content = (0i32..500i32).fold(column![], |column, _|{
+            column.push(spinner().width(Length::Fixed(64.0)).height(Length::Fixed(64.0)))
+        });
 
-        column![container(s)
-            .width(Length::Fill)
-            .height(Length::Fill)
-            .center_x()
-            .center_y(),]
-        .into()
+        scrollable(content).into()
     }
 }
 
 fn main() -> iced::Result {
-    SpinnerExample::run(Settings::default())
+    ManySpinnersExample::run(Settings::default())
 }

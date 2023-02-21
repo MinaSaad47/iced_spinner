@@ -19,8 +19,8 @@ pub struct Spinner {
 impl Default for Spinner {
     fn default() -> Self {
         Self {
-            width: Length::Shrink,
-            height: Length::Shrink,
+            width: Length::Fixed(20.0),
+            height: Length::Fixed(20.0),
             rate: Duration::from_secs_f32(1.0),
             padding: 0.0,
             radius: 2.0,
@@ -59,6 +59,14 @@ struct SpinnerState {
     t: f32,
 }
 
+fn is_visible(bounds: &Rectangle) -> bool {
+    bounds.width > 0.0 && bounds.height > 0.0
+}
+
+fn is_not_visible(bounds: &Rectangle) -> bool {
+    bounds.width < f32::EPSILON || bounds.height < f32::EPSILON
+}
+
 impl<Message, Renderer> Widget<Message, Renderer> for Spinner
 where
     Renderer: renderer::Renderer,
@@ -66,7 +74,6 @@ where
     fn width(&self) -> Length {
         self.width
     }
-
     fn height(&self) -> Length {
         self.height
     }
@@ -91,6 +98,9 @@ where
         _viewport: &Rectangle,
     ) {
         let bounds = layout.bounds();
+
+        if !is_visible(&bounds) { return }
+
         let size = if bounds.width < bounds.height {
             bounds.width
         } else {
@@ -133,27 +143,31 @@ where
         &mut self,
         state: &mut Tree,
         event: Event,
-        _layout: Layout<'_>,
+        layout: Layout<'_>,
         _cursor_position: Point,
         _renderer: &Renderer,
         _clipboard: &mut dyn Clipboard,
         shell: &mut Shell<'_, Message>,
     ) -> Status {
+        let bounds = layout.bounds();
+
         if let Event::Window(window::Event::RedrawRequested(now)) = event {
-            let state = state.state.downcast_mut::<SpinnerState>();
-            let duration = (now - state.last_update).as_secs_f32();
+            if is_visible(&bounds) {
+                let state = state.state.downcast_mut::<SpinnerState>();
+                let duration = (now - state.last_update).as_secs_f32();
 
-            state.t += duration * 1.0 / self.rate.as_secs_f32();
-            if state.t > 1.0 {
-                state.t -= 1.0;
+                state.t += duration * 1.0 / self.rate.as_secs_f32();
+                if state.t > 1.0 {
+                    state.t -= 1.0;
+                }
+
+                shell.request_redraw(window::RedrawRequest::At(
+                    now + Duration::from_millis(1000 / 60),
+                ));
+                state.last_update = now;
+
+                return Status::Captured;
             }
-
-            shell.request_redraw(window::RedrawRequest::At(
-                now + Duration::from_millis(1000 / 60),
-            ));
-            state.last_update = now;
-
-            return Status::Captured;
         }
 
         Status::Ignored
