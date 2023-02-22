@@ -60,11 +60,8 @@ struct SpinnerState {
 }
 
 fn is_visible(bounds: &Rectangle) -> bool {
-    bounds.width > 0.0 && bounds.height > 0.0
-}
-
-fn is_not_visible(bounds: &Rectangle) -> bool {
-    bounds.width < f32::EPSILON || bounds.height < f32::EPSILON
+    // bounds.width > 0.0 && bounds.height > 0.0
+    true
 }
 
 impl<Message, Renderer> Widget<Message, Renderer> for Spinner
